@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup as soup
 from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import datetime as dt 
+#import pprint 
 
 
 def scrape_all():
@@ -19,7 +20,8 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
-        "last_modified": dt.datetime.now()
+        "last_modified": dt.datetime.now(),
+        "hemispheres": hemisphere_img(browser)       
     }
     #Stop webdriver and return data
     browser.quit()
@@ -101,10 +103,34 @@ def mars_facts():
     #convert dataframe into HTML format, add bootstraps
     return df.to_html(classes="table table_striped")
 
+def hemisphere_img(browser):
+    url = 'https://marshemispheres.com/'
+
+    browser.visit(url)
+
+    # 2. Create a list to hold the images and titles.
+    hemisphere_image_urls = []
+
+    #3. Write code to retrieve the image urls and titles for each hemisphere.
+    for x in range(4):
+        hemispheres = {}
+        browser.find_by_css('a.product-item h3')[x].click()
+        element = browser.find_link_by_text('Sample').first
+        img_url = element['href']
+        title = browser.find_by_css("h2.title").text
+        hemispheres["img_url"] = img_url
+        hemispheres["title"] = title
+        hemisphere_image_urls.append(hemispheres)
+        browser.back()
+
+    # 4. Print the list that holds the dictionary of each image url and title.
+    return hemisphere_image_urls
+
+
 if __name__ == "__main__": 
     #if runningg as script, print scraped data
     print(scrape_all())
-    
+        
 # Below is the code from the instructions
 
 #     # Import Splinter, BeautifulSoup, and Pandas
